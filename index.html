@@ -802,7 +802,7 @@
     <p class="splash-instruction">
       Свайп <strong>ВПРАВО</strong> – <span class="safe-word">БЕЗОПАСНО</span>.<br>
       Свайп <strong>ВЛЕВО</strong> – <span class="threat-word">УГРОЗА / СКАМ</span>.<br>
-      Ошибешься – получишь <strong>+5 сек штрафного времени</strong> и разбор ошибки.<br>
+      Ошибешься – получишь <strong>+20 сек штрафного времени</strong> и разбор ошибки.<br>
       Готов?
     </p>
     <button id="btn-start" class="btn-start">НАЧАТЬ АУДИТ</button>
@@ -814,7 +814,7 @@
       <div class="status-badge timer" id="timer-box">
         <svg><use href="#icon-timer"></use></svg>
         <span id="timer-display">00:00</span>
-        <span class="penalty-flash" id="penalty-flash">+5с ШТРАФ!</span>
+        <span class="penalty-flash" id="penalty-flash">+20с ШТРАФ!</span>
       </div>
       <div class="header-right-group">
         <div class="status-badge counter-badge">
@@ -849,7 +849,7 @@
         <svg><use href="#icon-hazard"></use></svg>
       </div>
       <h2 class="modal-title">ФАТАЛЬНАЯ ОШИБКА!</h2>
-      <div class="modal-penalty-alert">+5 секунд штрафного времени</div>
+      <div class="modal-penalty-alert">+20 секунд штрафного времени</div>
       <div class="modal-feedback" id="modal-feedback-text"></div>
       <button class="btn-continue" id="btn-continue-error">ПОНЯТЬ И ПРОДОЛЖИТЬ</button>
     </div>
@@ -1383,7 +1383,7 @@
 
           // Пауза таймера и штраф
           pauseTimer();
-          addPenaltySeconds(5);
+          addPenaltySeconds(20);
 
           // Показ модального окна ошибки
           setTimeout(() => {
