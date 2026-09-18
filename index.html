@@ -260,6 +260,42 @@
       color: #f8fafc;
     }
 
+    .header-right-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-fullscreen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid var(--border-color);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 7px;
+      border-radius: 99px;
+      color: #f8fafc;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+    .btn-fullscreen:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.35);
+    }
+    .btn-fullscreen:active {
+      transform: scale(0.9);
+    }
+    .btn-fullscreen svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+    }
+
     /* ИГРОВОЕ ПОЛЕ */
     .game-board {
       flex: 1;
@@ -740,6 +776,12 @@
       <symbol id="icon-download" viewBox="0 0 24 24">
         <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
       </symbol>
+      <symbol id="icon-maximize" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+      </symbol>
+      <symbol id="icon-minimize" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path>
+      </symbol>
     </defs>
   </svg>
 
@@ -774,8 +816,13 @@
         <span id="timer-display">00:00</span>
         <span class="penalty-flash" id="penalty-flash">+5с ШТРАФ!</span>
       </div>
-      <div class="status-badge counter-badge">
-        <span id="counter-display">1 / 25</span>
+      <div class="header-right-group">
+        <div class="status-badge counter-badge">
+          <span id="counter-display">1 / 25</span>
+        </div>
+        <button class="btn-fullscreen" id="btn-fullscreen" aria-label="Полноэкранный режим" title="На весь экран">
+          <svg><use id="icon-fullscreen-use" href="#icon-maximize"></use></svg>
+        </button>
       </div>
     </header>
 
@@ -1130,6 +1177,44 @@
       }, 1400);
     }
 
+    // --- ПОЛНОЭКРАННЫЙ РЕЖИМ (FULLSCREEN API) ---
+    function requestFullScreenSafe() {
+      try {
+        const el = document.documentElement;
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          if (el.requestFullscreen) {
+            el.requestFullscreen().catch(() => {});
+          } else if (el.webkitRequestFullscreen) {
+            el.webkitRequestFullscreen();
+          }
+        }
+      } catch (e) {}
+    }
+
+    function toggleFullScreen() {
+      try {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          requestFullScreenSafe();
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen().catch(() => {});
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          }
+        }
+      } catch (e) {}
+    }
+
+    function updateFullscreenIcon() {
+      const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
+      const iconUse = document.getElementById('icon-fullscreen-use');
+      if (iconUse) {
+        iconUse.setAttribute('href', isFull ? '#icon-minimize' : '#icon-maximize');
+      }
+    }
+    document.addEventListener('fullscreenchange', updateFullscreenIcon);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+
     // Защита от системных скроллов
     document.addEventListener('touchmove', (e) => {
       if (!e.target.closest('.card-body') && !e.target.closest('.error-dialog') && !e.target.closest('.finish-dialog')) {
@@ -1140,6 +1225,7 @@
     // Инициализация игры
     document.getElementById('btn-start').addEventListener('click', () => {
       initAudio();
+      requestFullScreenSafe();
       document.getElementById('splash').classList.add('hidden');
       setTimeout(() => {
         document.getElementById('splash').style.display = 'none';
@@ -1147,6 +1233,8 @@
         startTrainer();
       }, 350);
     });
+
+    document.getElementById('btn-fullscreen').addEventListener('click', toggleFullScreen);
 
     function startTrainer() {
       // Перемешиваем колоду
